@@ -1,0 +1,32 @@
+Vagrant::Config.run do |config|
+  config.vm.provision :puppet, :module_path => "modules", :options => "--verbose --debug" do |puppet|
+    puppet.manifests_path = "manifests"
+    puppet.manifest_file = "development.pp"
+  end
+
+  config.vm.define :web do  |web_config|
+    web_config.vm.box = "natty"
+    web_config.vm.host_name = "webserver01"
+    # web_config.vm.boot_mode = :gui
+    web_config.vm.network "33.33.33.10"
+    web_config.vm.forward_port "http", 80, 8080
+    web_config.vm.share_folder "v-data", "/vagrant_data", "../Silex"
+  end
+
+  config.vm.define :db do |db_config|
+    db_config.vm.box = "natty"
+    db_config.vm.host_name = "dbserver01"
+    # db_config.vm.boot_mode = :gui
+    db_config.vm.network "33.33.33.11"
+    db_config.vm.forward_port "http", 3306, 13306
+  end
+
+  config.vm.define :ci do |ci_config|
+    ci_config.vm.box = "natty"
+    ci_config.vm.host_name = "ciserver01"
+    # ci_config.vm.boot_mode = :gui
+    ci_config.vm.network "33.33.33.12"
+    ci_config.vm.forward_port "http", 80, 8081
+    ci_config.vm.share_folder "v-data", "/vagrant_data", "../ci"
+  end
+end
